@@ -21,6 +21,6 @@ public final class Constants {
     public static final int kElevatorLeaderID = 20;
     public static final int kElevatorFollowerID = 33;
     public static final int kLimitSwitchPort = 1;
-    public static final int kCANCoderID = 3;
+    public static final int kCANCoderID = 0;
   }
 }

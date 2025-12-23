@@ -4,6 +4,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DutyCycle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ElevatorConstants;
 
@@ -11,6 +12,7 @@ import static edu.wpi.first.units.Units.*;
 
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
+import com.ctre.phoenix6.signals.FeedbackSensorSourceValue;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import com.ctre.phoenix6.configs.CurrentLimitsConfigs;
@@ -51,6 +53,8 @@ public class Elevator extends SubsystemBase {
             new FeedbackConfigs()
                 .withRotorToSensorRatio(1)
                 .withSensorToMechanismRatio(1)
+                .withFeedbackRemoteSensorID(elevatorEncoder.getDeviceID())
+                .withFeedbackSensorSource(FeedbackSensorSourceValue.RemoteCANcoder)
         ).withCurrentLimits(
             new CurrentLimitsConfigs()
                 .withStatorCurrentLimit(Amps.of(40))
@@ -62,8 +66,8 @@ public class Elevator extends SubsystemBase {
                 .withMotionMagicJerk(RotationsPerSecondPerSecond.per(Second).of(0))
         ).withSlot0(
             new Slot0Configs()
-                .withKP(1.0)
-                .withKI(0.0)
+                .withKP(5.0)
+                .withKI(2.0)
                 .withKD(0.0)
                 .withKG(0.2)
                 .withKS(0.0)
@@ -109,7 +113,7 @@ public class Elevator extends SubsystemBase {
     }
 
     public Command level1() {
-        return moveMotorCommand(2);
+        return moveMotorCommand(1);
     }
 
     public Command level2() {
@@ -130,5 +134,12 @@ public class Elevator extends SubsystemBase {
 
     public boolean closeToZero() {
         return getLeaderEncoderPosition() < 0.2;
+    }
+
+    public Command goToZero() {
+        return Commands.sequence(
+            moveMotorCommand(0.5).withTimeout(4),
+            goLimpCommand()
+        );
     }
 }
